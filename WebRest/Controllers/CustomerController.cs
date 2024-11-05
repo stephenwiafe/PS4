@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using WebRestEF.EF.Data;
 using WebRestEF.EF.Models;
@@ -12,48 +13,49 @@ namespace WebRest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GendersController : ControllerBase
+    public class CustomerController : ControllerBase, iController<Customer>
     {
         private readonly WebRestOracleContext _context;
 
-        public GendersController(WebRestOracleContext context)
+        public CustomerController(WebRestOracleContext context)
         {
             _context = context;
         }
 
-        // GET: api/Genders
+        // GET: api/Customer
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gender>>> GetGenders()
+        public async Task<ActionResult<IEnumerable<Customer>>> Get()
         {
-            return await _context.Genders.ToListAsync();
+            return await _context.Customers.ToListAsync();
         }
 
-        // GET: api/Genders/5
+        // GET: api/Customer/5
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<Gender>> GetGender(string id)
+        public async Task<ActionResult<Customer>> Get(string id)
         {
-            var gender = await _context.Genders.FindAsync(id);
+            var customer = await _context.Customers.FindAsync(id);
 
-            if (gender == null)
+            if (customer == null)
             {
                 return NotFound();
             }
 
-            return gender;
+            return customer;
         }
 
-        // PUT: api/Genders/5
+        // PUT: api/Customer/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGender(string id, Gender gender)
+        public async Task<IActionResult> Put(string id, Customer customer)
         {
-            if (id != gender.GenderId)
+            if (id != customer.CustomerId)
             {
                 return BadRequest();
             }
+            _context.Customers.Update(customer);
 
-            _context.Entry(gender).State = EntityState.Modified;
+
 
             try
             {
@@ -61,7 +63,7 @@ namespace WebRest.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!GenderExists(id))
+                if (!CustomerExists(id))
                 {
                     return NotFound();
                 }
@@ -74,36 +76,36 @@ namespace WebRest.Controllers
             return NoContent();
         }
 
-        // POST: api/Genders
+        // POST: api/Customer
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Gender>> PostGender(Gender gender)
+        public async Task<ActionResult<Customer>> Post(Customer customer)
         {
-            _context.Genders.Add(gender);
+            _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGender", new { id = gender.GenderId }, gender);
+            return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
         }
 
-        // DELETE: api/Genders/5
+        // DELETE: api/Customer/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGender(string id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var gender = await _context.Genders.FindAsync(id);
-            if (gender == null)
+            var customer = await _context.Customers.FindAsync(id);
+            if (customer == null)
             {
                 return NotFound();
             }
 
-            _context.Genders.Remove(gender);
+            _context.Customers.Remove(customer);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool GenderExists(string id)
+        private bool CustomerExists(string id)
         {
-            return _context.Genders.Any(e => e.GenderId == id);
+            return _context.Customers.Any(e => e.CustomerId == id);
         }
     }
 }
